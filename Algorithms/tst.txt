@@ -1,0 +1,15 @@
+1️⃣ "Optimisation des communications satellite-terrestre en bande K sous effet Doppler"
+📌 Problème : Les satellites en orbite basse (LEO) connaissent des variations de fréquence dues à l'effet Doppler.
+🎯 Objectif : Concevoir des algorithmes de correction et de compensation en temps réel pour améliorer la fiabilité des transmissions en bande K.
+🛠 Outils : Modélisation avec Python, simulation avec GNU Radio, Machine Learning pour la correction dynamique.
+
+2️⃣ "Protocoles de communication adaptatifs pour réseaux IoT en bande K"
+📌 Problème : Les objets connectés (IoT) en mobilité (drones, véhicules autonomes) subissent des interférences et des décalages Doppler.
+🎯 Objectif : Développer un protocole de transmission résistant aux variations de fréquence et aux pertes de paquets.
+🛠 Outils : Modulation adaptative, protocoles MAC optimisés pour la bande K, simulation avec ns-3.
+
+3️⃣ "Détection et correction d’erreurs dans les transmissions en bande K pour les réseaux 5G et 6G"
+📌 Problème : Les fréquences millimétriques utilisées pour la 5G/6G sont sensibles aux perturbations atmosphériques et à l'effet Doppler.
+🎯 Objectif : Élaborer des schémas de codage et de correction d'erreurs spécifiques aux transmissions en bande K.
+🛠 Outils : Codes LDPC/Turbo, simulations avec MATLAB/Python, FPGA pour tests réels.
+Ces sujets sont en lien avec les réseaux informatiques et les communications sans fil. Dis-moi si tu veux creuser une direction spécifique ! 🚀

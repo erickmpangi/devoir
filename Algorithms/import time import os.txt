@@ -1,0 +1,191 @@
+import time
+import os
+import csv
+from datetime import datetime
+
+def stable_matching(_, proposer, proposer_prefs, receiver_prefs):
+    # Initialisation des variables
+    free_proposers = list(proposer_prefs.keys())
+    engaged = {}
+    proposals = {proposer: 0 for proposer in free_proposers}
+
+    # Création d'un dictionnaire inverse pour les préférences des récepteurs
+    reverse_prefs = {
+        receiver: {proposer: rank for rank, proposer in enumerate(prefs)}
+        for receiver, prefs in receiver_prefs.items()
+    }
+
+    while free_proposers:
+        proposer = free_proposers[0]
+
+        # Vérifier si le proposeur a encore des préférences à proposer
+        if proposals[proposer] >= len(proposer_prefs[proposer]):
+            raise ValueError(f"Invalid preference list for {proposer}, missing preferences.")
+
+        # Sélectionner le prochain récepteur selon la liste de préférences du proposeur
+        receiver = proposer_prefs[proposer][proposals[proposer]]
+        proposals[proposer] += 1
+
+        if receiver not in engaged:
+            # Si le récepteur n'est pas encore engagé, l'engager avec le proposeur
+            engaged[receiver] = proposer
+            free_proposers.pop(0)
+        else:
+            # Si le récepteur est déjà engagé, comparer les préférences
+            current_partner = engaged[receiver]
+            if reverse_prefs[receiver][proposer] < reverse_prefs[receiver][current_partner]:
+                # Si le nouveau proposeur est préféré, mettre à jour l'engagement
+                engaged[receiver] = proposer
+                free_proposers.pop(0)
+                free_proposers.append(current_partner)
+
+    # Trier les résultats selon l'ordre des proposeurs
+    proposers_order = list(proposer_prefs.keys())
+    return sorted([(proposer, receiver) for receiver, proposer in engaged.items()],
+                  key=lambda pair: proposers_order.index(pair[0]))
+
+def write_execution_time_to_csv(file_number, execution_time, start_time, num_preferences):
+    # Ouvrir le fichier CSV pour ajouter le temps d'exécution et le nombre de préférences
+    with open('execution_times.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        # Si le fichier est vide, écrire l'en-tête
+        if file.tell() == 0:
+            writer.writerow(["File", "N (Preferences)", "Start Date and Time", "Execution Time (seconds)"])
+        writer.writerow([file_number, num_preferences, start_time.strftime("%Y-%m-%d %H:%M:%S"), execution_time])
+
+def read_preferences_from_file(file_name):
+    """
+    Fonction pour lire les préférences depuis un fichier .txt.
+    Suppose que la première ligne contient le nombre de participants et le type de proposeur.
+    """
+    men_prefs = {}
+    women_prefs = {}
+    num_preferences = 0  # Nombre total de lignes de préférences
+
+    # Construire le chemin complet du fichier dans le dossier 'input'
+    input_file_path = os.path.join('input', file_name)
+
+    # Vérifier si le fichier existe dans le dossier 'input'
+    if not os.path.exists(input_file_path):
+        raise FileNotFoundError(f"Le fichier '{input_file_path}' n'a pas été trouvé.")
+
+    with open(input_file_path, mode='r') as file:
+        lines = file.readlines()
+
+        # Lire la première ligne (nombre de participants et type de proposeur)
+        first_line = lines[0].strip().split()
+        n = int(first_line[0])  # Nombre de participants
+        proposer_type = first_line[1]  # 'm' pour les hommes ou 'w' pour les femmes
+
+        # En fonction du type de proposeur, nous analyserons le reste du fichier
+        for line in lines[1:]:
+            parts = line.strip().split()
+            person = parts[0]
+            preferences = parts[1:]
+
+            # Ajouter cette ligne de préférence à notre compte
+            num_preferences += 1
+
+            if proposer_type == 'm':
+                if person[0] == 'm':  # Homme
+                    men_prefs[person] = preferences
+                else:  # Femme
+                    women_prefs[person] = preferences
+            else:
+                if person[0] == 'w':  # Femme
+                    women_prefs[person] = preferences
+                else:  # Homme
+                    men_prefs[person] = preferences
+
+    return men_prefs, women_prefs, num_preferences
+
+def save_output_to_file(file_number, result):
+    """
+    Sauvegarde les résultats du matching dans un fichier de sortie.
+    Crée le dossier 'output' s'il n'existe pas.
+    """
+    # S'assurer que le dossier 'output' existe
+    if not os.path.exists('output'):
+        os.makedirs('output')
+
+    output_file = f'output/output_{file_number}.txt'
+
+    with open(output_file, mode='w') as file:
+        for proposer, receiver in result:
+            file.write(f"{proposer} {receiver}\n")
+
+def calculate_column_sums():
+    """
+    Calcule la somme des valeurs des colonnes dans le fichier CSV
+    (File, N (Preferences), et Execution Time).
+    """
+    file_sum = 0
+    n_sum = 0
+    execution_time_sum = 0
+    first_date = None  # On va stocker la première date
+
+    with open('execution_times.csv', mode='r') as file:
+        reader = csv.reader(file)
+        next(reader)  # Skip the header row
+        for row in reader:
+            file_sum += int(row[0])  # Somme des numéros de fichier
+            n_sum += int(row[1])  # Somme des préférences
+            execution_time_sum += float(row[3])  # Somme des temps d'exécution
+            if first_date is None:
+                first_date = row[2]  # Prendre la première date
+
+    return file_sum, n_sum, execution_time_sum, first_date
+
+if __name__ == "__main__":
+    # Lister tous les fichiers d'entrée
+    input_files = [f for f in os.listdir('input') if f.startswith('input_') and f.endswith('.txt')]
+
+    if not input_files:
+        print("Aucun fichier d'entrée trouvé dans le dossier 'input'.")
+        exit(1)
+
+    # Trier les fichiers par numéro extrait de leur nom (input_1.txt, input_2.txt, ...)
+    input_files.sort(key=lambda f: int(f.split('_')[1].split('.')[0]))
+
+    # Boucler à travers tous les fichiers d'entrée triés
+    for file_name in input_files:
+        print(f"Traitement du fichier : {file_name}")
+
+        # Lire les préférences des hommes et des femmes et le nombre de lignes de préférences depuis le fichier sélectionné
+        men_prefs, women_prefs, num_preferences = read_preferences_from_file(file_name)
+
+        # Mesurer le temps de début
+        start_time = datetime.now()
+
+        # Déterminer le type de proposeur (cela vient de la première ligne du fichier)
+        proposer_type = 'm' if 'm' in men_prefs else 'w'
+
+        # Appeler la fonction stable_matching avec les bonnes entrées
+        if proposer_type == 'm':
+            result = stable_matching(len(men_prefs), proposer_type, men_prefs, women_prefs)
+        else:
+            result = stable_matching(len(women_prefs), proposer_type, women_prefs, men_prefs)
+
+        # Afficher les résultats
+        for proposer, receiver in result:
+            print(proposer, receiver)
+
+        # Sauvegarder les résultats dans le dossier de sortie
+        save_output_to_file(file_name.split('.')[0], result)
+
+        # Mesurer le temps d'exécution
+        end_time = time.time()
+        execution_time = end_time - start_time.timestamp()
+
+        # Enregistrer le temps d'exécution, la date de début et le nombre de préférences dans le fichier CSV
+        write_execution_time_to_csv(file_name.split('_')[1].split('.')[0], execution_time, start_time, num_preferences)
+
+    # Calculer et afficher les sommes des colonnes
+    file_sum, n_sum, execution_time_sum, first_date = calculate_column_sums()
+
+    # Ajouter une ligne de somme dans le fichier CSV avec la première date enregistrée
+    with open('execution_times.csv', mode='a', newline='') as file:
+        writer = csv.writer(file)
+        # Ajouter les sommes dans la dernière ligne avec la date de la première entrée
+        writer.writerow([file_sum, n_sum, first_date, execution_time_sum])
+
