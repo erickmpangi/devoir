@@ -33,14 +33,14 @@ def main():
 
     path_exists, length, path = bfs(maze, R, C, Sr, Sc, Tr, Tc)
 
-    # Impression du format demandé
-    print(path_exists)
-    print()
-    print("Using the same maze and if the O number is 2 the output is:\n")
-    print(length if path_exists == "True" else 0)
-    print()
-    print("If the O number is 3 the output is:\n")
-    print(path if path_exists == "True" else "")
+    if O == 1:
+        print(path_exists)
+    elif O == 2:
+        print(length if path_exists == "True" else 0)
+    elif O == 3:
+        print(path if path_exists == "True" else "")
+    else:
+        print("Error O value")
 
 if __name__ == "__main__":
     main()
