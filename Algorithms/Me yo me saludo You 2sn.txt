@@ -1,0 +1,8 @@
+Me	 yo me saludo
+You(2sn) yo te saludo
+him	 yo lo saludo
+her 	 yo la saludo
+them 	 yo los saludo 
+
+
+
