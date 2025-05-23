@@ -1,0 +1,16 @@
+installation ROOT
+
+installation Libxrootd-dev
+
+sudo apt install libxrootd-dev
+cd ~
+git clone https://github.com/xrootd/xrootd.git
+cd xrootd
+mkdir build
+cd build
+cmake ..
+cmake --build . -- -j$(nproc)
+sudo cmake --install .
+
+
+

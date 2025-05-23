@@ -18,7 +18,7 @@ while i < len(lines):
     # Création des jobs avec leurs indices
     jobs = []
     for j in range(n):
-        jobs.append((d_list[j], j + 1, t_list[j]))  # (date_limite, index_original, temps)
+        jobs.append((d_list[j], j + 1, t_list[j]))  # (date limite, index original, temps)
 
     # Tri des jobs par date limite croissante
     jobs.sort()
