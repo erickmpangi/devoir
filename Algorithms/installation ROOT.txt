@@ -13,4 +13,21 @@ cmake --build . -- -j$(nproc)
 sudo cmake --install .
 
 
+Avec CONDA :
 
+# Installer Miniconda (si ce n'est pas déjà fait)
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+
+bash Miniconda3-latest-Linux-x86_64.sh
+# Suivre les instructions et recharger le terminal après l'installation.
+
+# Créer un environnement dédié pour ROOT
+conda create -n root_env python=3.9
+conda activate root_env
+
+# Installer ROOT avec Conda (version stable la plus récente)
+conda install -c conda-forge root
+
+Dépendances nécessaires :
+sudo apt update
+sudo apt install -y git cmake g++ gcc binutils libx11-dev libxpm-dev libxft-dev libxext-dev libssl-dev libgsl-dev libpython3-dev libqt5websockets5-dev libqt5opengl5-dev libqt5x11extras5-dev
