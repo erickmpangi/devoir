@@ -3,20 +3,16 @@ import sys
 
 lines = [line.strip() for line in sys.stdin if line.strip()]
 
-# Si la première ligne ne contient pas trois entiers, on l'ignore
-if len(lines[0].split()) != 3:
-    lines = lines[1:]
-
+n = int(lines[0])
 tasks = []
-for idx, line in enumerate(lines, start=1):
-    parts = line.split()
-    if len(parts) == 3:
-        s, f, p = map(int, parts)
-        tasks.append((s, f, p, idx))
+
+# Lire les tâches à partir de la 2ème ligne
+for idx, line in enumerate(lines[1:n+1], start=1):
+    s, f, p = map(int, line.split())
+    tasks.append((s, f, p, idx))
 
 # Trier les tâches par heure de fin
 tasks.sort(key=lambda x: x[1])
-n = len(tasks)
 dp = [0] * n
 parent = [-1] * n
 ends = [task[1] for task in tasks]
