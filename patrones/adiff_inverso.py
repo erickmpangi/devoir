@@ -1,3 +1,4 @@
+import math
 class Var:
     def __init__(self, value):
         self.value = value           # Valor de la variable
